@@ -16,14 +16,19 @@
 package com.example.android.quakereport;
 
 import android.app.LoaderManager;
+import android.content.Context;
 import android.content.Intent;
 import android.content.Loader;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -39,6 +44,7 @@ public class EarthquakeActivity extends AppCompatActivity implements LoaderManag
 
     public EarthquakeActivity() throws IOException {
     }
+    private TextView mEmptyStateTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,8 +74,26 @@ public class EarthquakeActivity extends AppCompatActivity implements LoaderManag
 
         });
 
-        LoaderManager loaderManager = getLoaderManager();
-        loaderManager.initLoader(EARTHQUAKE_LOADER_ID, null, this);
+        ConnectivityManager connManager = (ConnectivityManager)
+                getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        NetworkInfo netInfo = connManager.getActiveNetworkInfo();
+
+        mEmptyStateTextView = (TextView) findViewById(R.id.empty_view);
+        earthquakeListView.setEmptyView(mEmptyStateTextView);
+
+        if (netInfo != null && netInfo.isConnected()) {
+
+            LoaderManager loaderManager = getLoaderManager();
+
+            loaderManager.initLoader(EARTHQUAKE_LOADER_ID, null, this);
+        } else {
+            View loadingIndicator = findViewById(R.id.spinner);
+            loadingIndicator.setVisibility(View.GONE);
+
+            mEmptyStateTextView.setText(R.string.no_internet_connection);
+        }
+
     }
 
     @Override
@@ -79,6 +103,10 @@ public class EarthquakeActivity extends AppCompatActivity implements LoaderManag
 
     @Override
     public void onLoadFinished(Loader<List<Earthquake>> loader, List<Earthquake> earthquakes) {
+
+        View loadingIndicator = findViewById(R.id.spinner);
+        loadingIndicator.setVisibility(View.GONE);
+        mEmptyStateTextView.setText(R.string.no_earthquakes);
         mAdapter.clear();
 
         if (earthquakes != null && !earthquakes.isEmpty()) {
