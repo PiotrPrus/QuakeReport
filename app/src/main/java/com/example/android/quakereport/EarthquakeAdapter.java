@@ -55,7 +55,7 @@ public class EarthquakeAdapter extends ArrayAdapter<Earthquake>{
 
         magTextView.setText(formattedMagnitude);
 
-        //TODO: Split the String into 2 parts. One is containing the distance details and vector and second one has localization info.
+        //Split the String into 2 parts. One is containing the distance details and vector and second one has localization info.
 
         TextView offsetLocTextView = (TextView) listItemView.findViewById(R.id.offset_loc_text_view);
         TextView primaryLocTextView = (TextView) listItemView.findViewById(R.id.primary_loc_text_view);
